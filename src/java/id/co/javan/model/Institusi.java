@@ -5,11 +5,21 @@
 
 package id.co.javan.model;
 
+import java.io.Serializable;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+
+
 /**
  *
  * @author wisnu
  */
-public class Institusi {
+@Entity
+public class Institusi implements Serializable {
+    @Id
+    @GeneratedValue(strategy=GenerationType.AUTO)
     private Long id;
     private String kode;
     private String nama;

@@ -5,7 +5,9 @@
 package id.co.javan.controller.api;
 
 import id.co.javan.model.Institusi;
-import java.util.ArrayList;
+import id.co.javan.model.ResponseJSON;
+import id.co.javan.service.InstitusiService;
+import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import net.sf.json.JSONArray;
@@ -19,64 +21,124 @@ import org.springframework.web.servlet.mvc.multiaction.MultiActionController;
  */
 public class ApiInstitusiController extends MultiActionController {
 
+    InstitusiService institusiSrv;
+
+    public InstitusiService getInstitusiSrv() {
+        return institusiSrv;
+    }
+
+    public void setInstitusiSrv(InstitusiService institusiSrv) {
+        this.institusiSrv = institusiSrv;
+    }
+
     public ModelAndView list(HttpServletRequest req, HttpServletResponse resp) {
-        ArrayList institusiList = new ArrayList();
-
-        Institusi institusi1 = new Institusi();
-        institusi1.setId(1L);
-        institusi1.setKode("001");
-        institusi1.setNama("Institusi 1");
-        institusiList.add(institusi1);
-
-        id.co.javan.model.Institusi institusi2 = new id.co.javan.model.Institusi();
-        institusi2.setId(1L);
-        institusi2.setKode("001");
-        institusi2.setNama("Institusi 2");
-        institusiList.add(institusi1);
+        List<Institusi> institusiList = institusiSrv.list();
 
         ModelAndView mv = new ModelAndView("api");
-        mv.addObject("json", JSONArray.fromObject(institusiList).toString());
+        ResponseJSON response = new ResponseJSON();
+        response.setArrayOfObject(institusiList.toArray());
+        response.setMessage("Sukses menambahkan institusi");
+        String json = "";
+        if (req.getParameter("callback")!=null && req.getParameter("callback").length() > 0) {
+            json = req.getParameter("callback") + "(" + JSONObject.fromObject(response).toString() + ")";
+        } else {
+            json = JSONObject.fromObject(response).toString();
+        }
+        mv.addObject("json", json);
         return mv;
     }
 
     public ModelAndView doAdd(HttpServletRequest req, HttpServletResponse resp) {
-        id.co.javan.model.Institusi institusi1 = new id.co.javan.model.Institusi();
-        institusi1.setId(1L);
-        institusi1.setKode("001");
-        institusi1.setNama("Institusi 1");
+        String kode = req.getParameter("kode");
+        String nama = req.getParameter("nama");
+        Institusi institusi1 = new Institusi();
+        institusi1.setKode(kode);
+        institusi1.setNama(nama);
+        institusiSrv.add(institusi1);
         ModelAndView mv = new ModelAndView("api");
-        mv.addObject("json", JSONObject.fromObject(institusi1).toString());
+        ResponseJSON response = new ResponseJSON();
+        response.setObject(institusi1);
+        response.setMessage("Sukses menambahkan institusi");
+
+        String json = "";
+        if (req.getParameter("callback")!=null && req.getParameter("callback").length() > 0) {
+            json = req.getParameter("callback") + "(" + JSONObject.fromObject(response).toString() + ")";
+        } else {
+            json = JSONObject.fromObject(response).toString();
+        }
+        mv.addObject("json", json);
 
         return mv;
     }
 
     public ModelAndView doSave(HttpServletRequest req, HttpServletResponse resp) {
-        id.co.javan.model.Institusi institusi1 = new id.co.javan.model.Institusi();
-        institusi1.setId(1L);
-        institusi1.setKode("001");
-        institusi1.setNama("Institusi 1");
+        Long id = Long.parseLong(req.getParameter("id"));
+        Institusi institusi1 = institusiSrv.findById(id);
         ModelAndView mv = new ModelAndView("api");
-        mv.addObject("json", JSONObject.fromObject(institusi1).toString());
+        if (institusi1 != null) {
+            String kode = req.getParameter("kode");
+            String nama = req.getParameter("nama");
 
+            institusi1.setKode(kode);
+            institusi1.setNama(nama);
+            institusiSrv.update(institusi1);
+
+            ResponseJSON response = new ResponseJSON();
+            response.setObject(institusi1);
+            response.setMessage("Sukses menyimpan institusi");
+            String json = "";
+            if (req.getParameter("callback")!=null && req.getParameter("callback").length() > 0) {
+                json = req.getParameter("callback") + "(" + JSONObject.fromObject(response).toString() + ")";
+            } else {
+                json = JSONObject.fromObject(response).toString();
+            }
+            mv.addObject("json", json);
+        }
         return mv;
     }
 
     public ModelAndView delete(HttpServletRequest req, HttpServletResponse resp) {
         ModelAndView mv = new ModelAndView("api");
-        mv.addObject("json", true);
-
+        Long id = Long.parseLong(req.getParameter("id"));
+        Institusi institusi1 = institusiSrv.findById(id);
+        ResponseJSON response = new ResponseJSON();
+        String json = "";
+        if (institusi1 != null) {
+            institusiSrv.delete(institusi1);
+            response.setMessage("Sukses menyimpan institusi");
+        } else {
+            response.setError(true);
+            response.setMessage("Ada kesalahan di server");
+        }
+        if (req.getParameter("callback")!=null && req.getParameter("callback").length() > 0) {
+            json = req.getParameter("callback") + "(" + JSONObject.fromObject(response).toString() + ")";
+        } else {
+            json = JSONObject.fromObject(response).toString();
+        }
+        mv.addObject("json", json);
         return mv;
     }
 
-
     public ModelAndView get(HttpServletRequest req, HttpServletResponse resp) {
-        id.co.javan.model.Institusi institusi1 = new id.co.javan.model.Institusi();
-        institusi1.setId(1L);
-        institusi1.setKode("001");
-        institusi1.setNama("Institusi 1");
+        Long id = Long.parseLong(req.getParameter("id"));
+        Institusi institusi1 = institusiSrv.findById(id);
 
         ModelAndView mv = new ModelAndView("api");
-        mv.addObject("json", JSONObject.fromObject(institusi1).toString());
+        ResponseJSON response = new ResponseJSON();
+        if (institusi1 != null) {
+            response.setObject(institusi1);
+            response.setMessage("Institusi ditemukan");
+        } else {
+            response.setError(true);
+            response.setMessage("Institusi tidak ditemukan");
+        }
+        String json = "";
+        if (req.getParameter("callback")!=null && req.getParameter("callback").length() > 0) {
+            json = req.getParameter("callback") + "(" + JSONObject.fromObject(response).toString() + ")";
+        } else {
+            json = JSONObject.fromObject(response).toString();
+        }
+        mv.addObject("json", json);
 
         return mv;
     }

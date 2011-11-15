@@ -7,5 +7,7 @@
     <property name="hibernate.connection.url">jdbc:mysql://localhost/project_bapas</property>
     <property name="hibernate.connection.username">root</property>
     <property name="hibernate.connection.password">F1r315h0T</property>
+
+    <mapping class="id.co.javan.model.Institusi"/>
   </session-factory>
 </hibernate-configuration>

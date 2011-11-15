@@ -15,7 +15,7 @@
     for the index controller we are using ParameterizableViewController, so we must
     define an explicit mapping for it.
     -->
-    <bean id="urlMapping" class="org.springframework.web.servlet.handler.BeanNameUrlHandlerMapping">        
+    <bean id="urlMapping" class="org.springframework.web.servlet.handler.BeanNameUrlHandlerMapping">
     </bean>
     
     <bean id="viewResolver"
@@ -27,5 +27,7 @@
     The index controller.
     -->
     <bean name="/index.htm" class="id.co.javan.controller.IndexController" />
-    <bean name="/api/*.htm" class="id.co.javan.controller.api.ApiInstitusiController" />
+    <bean name="/api/*.htm" class="id.co.javan.controller.api.ApiInstitusiController">
+        <property name="institusiSrv" ref="institusiSrv"/>
+    </bean>
 </beans>
