@@ -1,0 +1,7 @@
+BAPAS - DOJO KLIEN
+Dojo klien adalah snippet pemanfaatan DOJO Javascript framework untuk mengakses API Bapas yang mengembalikan JSON 
+
+Untuk mengubah alamat server, ubah variable URL_API ke alamat API Bapas Server
+Contoh URL_API
+var URL_API = "http://javan.web.id:8080/Bapas/api";
+

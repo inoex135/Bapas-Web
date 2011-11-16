@@ -37,13 +37,14 @@ public class ApiInstitusiController extends MultiActionController {
         ModelAndView mv = new ModelAndView("api");
         ResponseJSON response = new ResponseJSON();
         response.setArrayOfObject(institusiList.toArray());
-        response.setMessage("Sukses menambahkan institusi");
+        response.setMessage("Daftar Institusi");
         String json = "";
-        if (req.getParameter("callback")!=null && req.getParameter("callback").length() > 0) {
+        if (req.getParameter("callback") != null && req.getParameter("callback").length() > 0) {
             json = req.getParameter("callback") + "(" + JSONObject.fromObject(response).toString() + ")";
         } else {
             json = JSONObject.fromObject(response).toString();
         }
+
         mv.addObject("json", json);
         return mv;
     }
@@ -51,17 +52,23 @@ public class ApiInstitusiController extends MultiActionController {
     public ModelAndView doAdd(HttpServletRequest req, HttpServletResponse resp) {
         String kode = req.getParameter("kode");
         String nama = req.getParameter("nama");
-        Institusi institusi1 = new Institusi();
-        institusi1.setKode(kode);
-        institusi1.setNama(nama);
-        institusiSrv.add(institusi1);
-        ModelAndView mv = new ModelAndView("api");
-        ResponseJSON response = new ResponseJSON();
-        response.setObject(institusi1);
-        response.setMessage("Sukses menambahkan institusi");
-
         String json = "";
-        if (req.getParameter("callback")!=null && req.getParameter("callback").length() > 0) {
+        ResponseJSON response = new ResponseJSON();
+        ModelAndView mv = new ModelAndView("api");
+        if (kode != null && nama != null) {
+            Institusi institusi1 = new Institusi();
+            institusi1.setKode(kode);
+            institusi1.setNama(nama);
+            institusiSrv.add(institusi1);
+
+            response.setObject(institusi1);
+            response.setMessage("Sukses menambahkan institusi");
+
+        } else {
+            response.setError(true);
+            response.setMessage("kode dan nama tidak boleh kosong");
+        }
+        if (req.getParameter("callback") != null && req.getParameter("callback").length() > 0) {
             json = req.getParameter("callback") + "(" + JSONObject.fromObject(response).toString() + ")";
         } else {
             json = JSONObject.fromObject(response).toString();
@@ -72,45 +79,60 @@ public class ApiInstitusiController extends MultiActionController {
     }
 
     public ModelAndView doSave(HttpServletRequest req, HttpServletResponse resp) {
-        Long id = Long.parseLong(req.getParameter("id"));
-        Institusi institusi1 = institusiSrv.findById(id);
         ModelAndView mv = new ModelAndView("api");
-        if (institusi1 != null) {
-            String kode = req.getParameter("kode");
-            String nama = req.getParameter("nama");
+        String json = "";
+        ResponseJSON response = new ResponseJSON();
+        if (req.getParameter("id") != null) {
+            Long id = Long.parseLong(req.getParameter("id"));
+            Institusi institusi1 = institusiSrv.findById(id);
 
-            institusi1.setKode(kode);
-            institusi1.setNama(nama);
-            institusiSrv.update(institusi1);
 
-            ResponseJSON response = new ResponseJSON();
-            response.setObject(institusi1);
-            response.setMessage("Sukses menyimpan institusi");
-            String json = "";
-            if (req.getParameter("callback")!=null && req.getParameter("callback").length() > 0) {
-                json = req.getParameter("callback") + "(" + JSONObject.fromObject(response).toString() + ")";
+            if (institusi1 != null) {
+                String kode = req.getParameter("kode");
+                String nama = req.getParameter("nama");
+
+                institusi1.setKode(kode);
+                institusi1.setNama(nama);
+                institusiSrv.update(institusi1);
+
+                response.setObject(institusi1);
+                response.setMessage("Sukses menyimpan institusi");
             } else {
-                json = JSONObject.fromObject(response).toString();
+                response.setError(true);
+                response.setMessage("Objek tidak ditemukan");
             }
-            mv.addObject("json", json);
+        } else {
+            response.setError(true);
+            response.setMessage("Objek tidak ditemukan");
         }
+        if (req.getParameter("callback") != null && req.getParameter("callback").length() > 0) {
+            json = req.getParameter("callback") + "(" + JSONObject.fromObject(response).toString() + ")";
+        } else {
+            json = JSONObject.fromObject(response).toString();
+        }
+        mv.addObject("json", json);
         return mv;
     }
 
     public ModelAndView delete(HttpServletRequest req, HttpServletResponse resp) {
         ModelAndView mv = new ModelAndView("api");
-        Long id = Long.parseLong(req.getParameter("id"));
-        Institusi institusi1 = institusiSrv.findById(id);
-        ResponseJSON response = new ResponseJSON();
         String json = "";
-        if (institusi1 != null) {
-            institusiSrv.delete(institusi1);
-            response.setMessage("Sukses menyimpan institusi");
+        ResponseJSON response = new ResponseJSON();
+        if (req.getParameter("id") != null) {
+            Long id = Long.parseLong(req.getParameter("id"));
+            Institusi institusi1 = institusiSrv.findById(id);
+            if (institusi1 != null) {
+                institusiSrv.delete(institusi1);
+                response.setMessage("Sukses menyimpan institusi");
+            } else {
+                response.setError(true);
+                response.setMessage("Ada kesalahan di server");
+            }
         } else {
             response.setError(true);
             response.setMessage("Ada kesalahan di server");
         }
-        if (req.getParameter("callback")!=null && req.getParameter("callback").length() > 0) {
+        if (req.getParameter("callback") != null && req.getParameter("callback").length() > 0) {
             json = req.getParameter("callback") + "(" + JSONObject.fromObject(response).toString() + ")";
         } else {
             json = JSONObject.fromObject(response).toString();
@@ -133,7 +155,7 @@ public class ApiInstitusiController extends MultiActionController {
             response.setMessage("Institusi tidak ditemukan");
         }
         String json = "";
-        if (req.getParameter("callback")!=null && req.getParameter("callback").length() > 0) {
+        if (req.getParameter("callback") != null && req.getParameter("callback").length() > 0) {
             json = req.getParameter("callback") + "(" + JSONObject.fromObject(response).toString() + ")";
         } else {
             json = JSONObject.fromObject(response).toString();
